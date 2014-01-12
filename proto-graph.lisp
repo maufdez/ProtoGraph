@@ -1,3 +1,14 @@
+(defpackage :proto-graph 
+  (:use :common-lisp)
+  (:export :node-create
+	   :node-match
+	   :link-create
+	   :get-prop
+	   :set-prop
+	   :dump-props ))
+
+(in-package :proto-graph)
+
 (defvar *id-counter* 0
   "This variable will make sure that each node has a unique id.")
 
@@ -10,16 +21,15 @@
 (defvar *filters*
   "Used to store properties to match in links or nodes")
 
+;;; Class definition, we start with a thing (could not think of a better name)
+;;; which parents both nodes and links, to avoid writing too many methods
+;;; for things that are common to both.
+
 (defclass thing ()
   ((properties
     :documentation "A plist with properties for a thing in the DB"
     :initarg :properties
     :accessor properties)))
-
-
-;;; Class definition, we start with a thing (could not think of a better name)
-;;; which parents both nodes and links, to avoid writing too many methods
-;;; for things that are common to both.
 
 (defclass node (thing)
   ((id
@@ -54,11 +64,17 @@
 (defgeneric set-prop (object property value)
   (:documentation "Set the value for a property in the plist"))
 
+(defgeneric dump-props (object)
+  (:documentation "This method will print the properties was copied from Practical Common Lisp" ))
+
 (defmethod get-prop ((object thing) property)
   (getf (properties object) property))
 
 (defmethod set-prop ((object thing) property value)
   (setf (getf (properties object) property) value))
+
+(defmethod dump-props ((object thing))
+  (format t "~{~a:~10t~a~%~}~%" (properties object)))
 
 (defgeneric meets-filter (object)
   (:documentation "Uses the filters stored in the special variable *filters* to check if the properties of a method meet it"))
@@ -68,7 +84,8 @@
 
 ;;; Functions and Macros for nodes
 (defun node-create (&key (label :default) properties)
-  (push (make-instance 'node :label-list (list label) :properties properties) *nodes*))
+  ;;I use a CAR to have the function return just the node that was just added.
+  (car (push (make-instance 'node :label-list (list label) :properties properties) *nodes*)))
 
 (defun has-label (label)
   (remove-if-not (lambda (n)(find label (label-list n))) *nodes*))
@@ -79,6 +96,11 @@
 		  (has-label label))
 	(if properties (remove-if-not #'meets-filter *nodes*)
 	    *nodes*))))
+
+(defmethod print-object ((object node) stream)
+  (print-unreadable-object (object stream :type t)
+    (with-slots (id properties) object
+      (format stream "ID: ~a ~{|~a: ~a ~}" id properties))))
 
 ;;; Functions and Macros for links
 (defun link-create (type from-node to-node &key properties)

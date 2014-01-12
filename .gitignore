@@ -1,6 +1,10 @@
 # Common Lisp Ignore
 *.fasl
 *.FASL
+*.fas
+*.FAS
+*.lib
+*.LIB
 *.lisp-temp
 
 # Ignore EMACS temporary files
