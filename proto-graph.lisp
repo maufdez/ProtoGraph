@@ -1,6 +1,7 @@
 (defpackage :proto-graph 
   (:use :common-lisp)
-  (:export :node-create
+  (:export :get-keys 
+	   :node-create
 	   :node-match
 	   :link-create
 	   :get-prop
@@ -21,6 +22,15 @@
 (defvar *filters*
   "Used to store properties to match in links or nodes")
 
+;;; Utilities, maybe to be moved to a different library later
+
+;; get-keys gets every other element of a list, starting from the first.
+(defun get-keys (list) 
+"Get the keys from a plist"
+  (if (cdr list) 
+      (cons (car list) (get-keys (cddr list))) 
+      nil))
+
 ;;; Class definition, we start with a thing (could not think of a better name)
 ;;; which parents both nodes and links, to avoid writing too many methods
 ;;; for things that are common to both.
@@ -33,7 +43,7 @@
 
 (defclass node (thing)
   ((id
-    :initform (prog1 *id-counter* (incf *id-counter*))
+    :initform (prog1 *id-counter* (incf *id-counter*)) ;the prog1 is to have the value returned before increasing.
     :reader id)
    (label-list
     :documentation "List with the labels for the current node"
@@ -80,7 +90,7 @@
   (:documentation "Uses the filters stored in the special variable *filters* to check if the properties of a method meet it"))
 
 (defmethod meets-filter ((object thing))
-  (reduce (lambda (a b)(and a b))(mapcar (lambda (p)(equal (getf *filters* p)(get-prop object p)))(remove-if-not #'symbolp *filters*))))
+  (reduce (lambda (a b)(and a b))(mapcar (lambda (p)(equal (getf *filters* p)(get-prop object p)))(get-keys *filters*))))
 
 ;;; Functions and Macros for nodes
 (defun node-create (&key (label :default) properties)
