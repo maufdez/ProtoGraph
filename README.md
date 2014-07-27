@@ -1,35 +1,59 @@
-This is meant to become a library for prototyping neo4j style DB applications, the reason for writing this are both to code something interesting, and to understand how a graph database may work, is my unnderstanding of how to implement something with the features of neo4j 2.0, but it is still in very early stages. Currently it allows for creation of nodes and links, the nodes can have one or more labels associated to it, an id is automatically assigned to them, and can have a list of setfable properties (simple plist). The links must have a type, a from-node and a to-node, and it checks that the from and to nodes are not the same, and it also can have a list of properties (simple-plist).
+# Proto-Graph: A graph database.
 
-Currently the nodes and links are stored in simple lists, with no persistency, which is ok for now, since I'm using this only for prototyping.
+**Note:** As of 7/27/2014 I am keeping my ramblings in the Wiki to keep the README cleaner and more relevant to the reader.
 
-The properties in both nodes and links are represented by property lists, and it is assumed that the values can only be Strings, numbers or boolean, but it will also accept characters and some other types.
+## Overview:
 
-The current implementation allows for searching of nodes (with node-match), getting the list of nodes with a particular label (with has-label), and getting the list of links of a particular type (with has-type).
+Proto-graph is a prototyping graph-database (ala Neo4j) written completely in Common lisp, although it now aspires to be more than just a prototyping tool.
 
-Just added the functions for filtering links, links-with-type, links-from-node, links-to-node.
+Graph DBs are a form of no-SQL databases which are based on Math Graphs. In proto-graph nodes are called nodes, and edges are called links. Both edges and links are CLOS classes, derived from a more primitive class called thing.
 
-Inmediate things to follow are:
-- Implementation of indexing (add and use indexes from the property list). (0%).
-- Printing for the Link and Node objects (100%).
-  - Complete Nodes print-object. [DONE]
-  - Complete Link print-object. [DONE]
-  - Introduce function to dump properties. [DONE]
-- Put everything in a package and select the exported functions. [On-track]
-  Note: Created the package and exported the desired already existing functions (get-keys, node-create, link-create, node-match, get-prop, set-prop, dump-props,liks-with-type,links-from-node,links-to-node)
+Each node can have one ore several labels, represented by keyword parameters, if no label is provided the `:default` label is used. Nodes also have a list of properties, represented by a p-list where the keys are keyword parameters, and the values can be of any type, the matching is performed using an `equal` equality predicate.
 
-Where am I going with this? My idea is to design a DSL to represent something similar to Cypher but lispier, and hopefully have that be a wrapper on top of the neo4j RESTAPI, (I know CL-NEO4J could be used for the same thing but I want it to be closer to Cypher and reflecting the latest 2.0 version), anyhow, I might end up taking a completely different direction.
+Each link can must have a type which is also a keyword paramenter, a from-node and a to-node, which cannot be the same node. Links can also have a property list with the same characteristics as the properties for a node.
 
-I´ve been thinking on using manardb for persistency so I can use whatever I come up with instead of Neo4j for the project I'm working on, but I still need to get a better understanding of manardb, which seems to be what I want since it is pure lisp with no "SQL-DB" backend. With a prolog like query system like the one outlined in the ON-LISP book, it could be a usable system, and much more interesting to me than just wrapping something around neo4j.
+## Expected functionality:
+
+The user should be able to find particular nodes, based on label and/or properties, and move to or from those nodes trough links to find other nodes related to it, this relation (type) and the properties of it can also be part of the querie, and any property from nodes and links, the node labels and link typeshould be easily extractable for use as the query results.
+
+The user shold also be able to find a particular link, based on type and/or properties and move from there as described above.
+
+Proto-graph should be able to traverse the whole graph without getting stuck on circlar references.
+
+The database should be persistend, and fully CRUD.
+
+## Other goals:
+
+* Proto-graph should be fully programmed in Common Lisp, with no backend SQL database, and no calls to libaries written in other languages, it also will use only libraries that only depend on Common Lisp (no external DBs or FFIs).
+* Proto-graph shuld have an s-expression based query language which does not look foreight to LISPers.
+* Proto-graph is for LISPers, any API to make it accessible to other languages is not prioritary.
+
+## Current functionality:
+
+Currently proto-graph has can:
+* Create Nodes with labels and properties, no sanity check is done on the user input. `(node-create ...)`
+* Create directed Links each with type and optinally properties. `(link-create ...)`
+* Modify the properties of both Nodes and Links. `(setf (get-property ...))`
+* Find Nodes with particular labels and or properties. `(node-match ...)`
+* Find Links of a particular type.  `(links-with-type ...)`
+* Find Links which start at a particular node. `(links-from-node ...)`
+* Find Links wich end at a particular node. `(links-to-node ...)`
+* Nest Link finding functions to combine the functionality.
+* Dumping properties of a node or a link. `(dump-props ...)`
+
+Currently the DB is non persistent, and there are no functions to delete records. Functionality to modify labels in nodes, or types in links, is still missing.
+
+## Notes:
 
 Contributions and critics are welcomed, but bear in mind this is still very raw.
 
-# Example usage (With the current functions)
+## Example usage (With the current functions)
 
 Let's say we want to create a movie database, with the names of the actors, directors, movies, and maybe later some other information like locations, etc.
 
 I will start adding one movie, with a couple of actors and the director:
 
-```
+```common-lisp
 (defvar *solo* (node-create :label :person :properties '(:name "Harrison" :surname "Ford")))
 (defvar *leia* (node-create :label :person :properties '(:name "Carrie" :surname "Fisher")))
 (defvar *lucas* (node-create :label :person :properties '(:name "George" :surname "Lucas")))
@@ -37,11 +61,13 @@ I will start adding one movie, with a couple of actors and the director:
 
 And then we can add the movie:
 
-    (defvar *movie* (node-create :label :movie :properties '(:title "Star Wars")))
+```common-lisp
+(defvar *movie* (node-create :label :movie :properties '(:title "Star Wars")))
+```
 
 Now we can create links for our graph:
 
-```
+```common-lisp
 (link-create :acts-on *solo* *movie* :properties '(:plays "Han Solo"))
 (link-create :acts-on *leia* *movie* :properties '(:plays "Leia Organa"))
 (link-create :directs *lucas* *movie*)
@@ -49,7 +75,9 @@ Now we can create links for our graph:
 
 With the database now in place, we can find the names of the cast:
 
-    (links-with-type :acts-on (links-to-node *movie*))
+```common-lisp
+(links-with-type :acts-on (links-to-node *movie*))
+```
 
 Which will give the following result:
 
@@ -64,4 +92,4 @@ Which will give the following result:
 
 Of course, the result is ugly and not very legible, because it is merely using the print-unreadable-object, but we can see that we have the rudiments for querying a graph database.
 
-Currently proto-graph does not check that an identical register already exists in the database before creating it, and there is no way to delete records from the database, modifying properties or adding new ones should be possible, set-prop is not really needed, since you can setf get-prop, so I will eliminated it. This just to make it CRUD, and later I need to make the DB persistent, and ad some sugar around stuff to make it easier to use.
+Currently proto-graph does not check that an identical register already exists in the database before creating it, and there is no way to delete records from the database. Modifying properties or adding new ones should be possible, set-prop is not really needed, since you can setf get-prop, so I will eliminate it. These changes would be necessary just to make it CRUD, and later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
