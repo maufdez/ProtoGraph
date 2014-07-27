@@ -30,7 +30,7 @@ The database should be persistent, and fully CRUD.
 
 ## Current functionality:
 
-Currently proto-graph has can:
+Currently proto-graph can:
 * Create Nodes with labels and properties, no sanity check is done on the user input. `(node-create ...)`
 * Create directed Links each with type and optinally properties. `(link-create ...)`
 * Modify the properties of both Nodes and Links. `(setf (get-property ...))`
