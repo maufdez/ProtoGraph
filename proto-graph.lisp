@@ -6,7 +6,10 @@
 	   :link-create
 	   :get-prop
 	   :set-prop
-	   :dump-props ))
+	   :dump-props 
+	   :links-with-type
+	   :links-from-node
+	   :links-to-node ))
 
 (in-package :proto-graph)
 
@@ -55,7 +58,7 @@
   ((type
     :initarg :type
     :initform (error "Must supply a link type")
-    :reader type)
+    :reader of-type)
    (from-node
     :documentation "Links are directed will start from this node"
     :initarg :from-node
@@ -79,7 +82,7 @@
 
 (defmethod get-prop ((object thing) property)
   (getf (properties object) property))
-
+   
 (defmethod set-prop ((object thing) property value)
   (setf (getf (properties object) property) value))
 
@@ -112,11 +115,25 @@
     (with-slots (id properties) object
       (format stream "ID: ~a ~{|~a: ~a ~}" id properties))))
 
+(defmethod print-object ((object link) stream)
+  (print-unreadable-object (object stream :type t)
+    (with-slots (type from-node to-node) object
+      (format stream "~a [~a]  ~a" from-node type to-node))))
+
 ;;; Functions and Macros for links
 (defun link-create (type from-node to-node &key properties)
   (if (eq from-node to-node)
       (error "From and to nodes can not be equal")
       (push (make-instance 'link :type type :from-node from-node :to-node to-node :properties properties) *links*)))
 
-(defun has-type (type)
-  (remove-if-not (lambda (n)(equal type (type n))) *links*))
+(defun links-with-type (type &optional (list *links*))
+  "Returns a list of only links with a specified type from a list"
+  (remove-if-not (lambda (n)(equal type (of-type n))) list))
+
+(defun links-from-node (node &optional (list *links*))
+  "Retursn a list of only links starting at a specified node from a list"
+  (remove-if-not #'(lambda (n) (eq node (from-node n))) list))
+
+(defun links-to-node (node &optional (list *links*))
+  "Retursn a list of only links ending at a specified node from a list"
+  (remove-if-not #'(lambda (n) (eq node (to-node n))) list))
