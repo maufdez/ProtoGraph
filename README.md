@@ -6,21 +6,21 @@
 
 Proto-graph is a prototyping graph-database (ala Neo4j) written completely in Common lisp, although it now aspires to be more than just a prototyping tool.
 
-Graph DBs are a form of no-SQL databases which are based on Math Graphs. In proto-graph nodes are called nodes, and edges are called links. Both edges and links are CLOS classes, derived from a more primitive class called thing.
+Graph DBs are a form of no-SQL databases which are based on Math Graphs. In proto-graph nodes are called *nodes*, and edges are called *links*. Both *nodes* and *links* are CLOS classes, derived from a more primitive class called *thing*.
 
 Each node can have one ore several labels, represented by keyword parameters, if no label is provided the `:default` label is used. Nodes also have a list of properties, represented by a p-list where the keys are keyword parameters, and the values can be of any type, the matching is performed using an `equal` equality predicate.
 
-Each link can must have a type which is also a keyword paramenter, a from-node and a to-node, which cannot be the same node. Links can also have a property list with the same characteristics as the properties for a node.
+Each link must have a *type* which is also a keyword paramenter, a *from-node* and a *to-node*, which cannot be the same node. Links can also have a property list with the same characteristics as the properties for a node.
 
 ## Expected functionality:
 
-The user should be able to find particular nodes, based on label and/or properties, and move to or from those nodes trough links to find other nodes related to it, this relation (type) and the properties of it can also be part of the querie, and any property from nodes and links, the node labels and link typeshould be easily extractable for use as the query results.
+The user should be able to find particular nodes, based on *label* and/or *properties*, and move to or from those nodes trough links to find other nodes related to it, this relation (*type*) and the properties of it can also be part of the querie, and any property from nodes and links, the node labels and link type should be easily extractable for use as the query results.
 
-The user shold also be able to find a particular link, based on type and/or properties and move from there as described above.
+The user should also be able to find a particular link, based on *type* and/or properties and move from there as described above.
 
-Proto-graph should be able to traverse the whole graph without getting stuck on circlar references.
+Proto-graph should be able to traverse the whole graph without getting stuck on circular references.
 
-The database should be persistend, and fully CRUD.
+The database should be persistent, and fully CRUD.
 
 ## Other goals:
 
