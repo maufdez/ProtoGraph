@@ -132,7 +132,7 @@
 (defun link-create (type from-node to-node &key properties)
   (if (eq from-node to-node)
       (error "From and to nodes can not be equal")
-      (push (make-instance 'link :type type :from-node from-node :to-node to-node :properties properties) *links*)))
+      (car (push (make-instance 'link :type type :from-node from-node :to-node to-node :properties properties) *links*))))
 
 (defun links-with-type (type &optional (list *links*))
   "Returns a list of only links with a specified type from a list"
