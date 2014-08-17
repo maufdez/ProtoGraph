@@ -3,13 +3,15 @@
   (:export :get-keys 
 	   :node-create
 	   :node-match
+	   :node-remove
 	   :link-create
 	   :get-prop
 	   :set-prop
 	   :dump-props 
 	   :links-with-type
 	   :links-from-node
-	   :links-to-node ))
+	   :links-to-node 
+	   :link-remove ))
 
 (in-package :proto-graph)
 
@@ -120,6 +122,12 @@
     (with-slots (type from-node to-node) object
       (format stream "~a [~a]  ~a" from-node type to-node))))
 
+(defun node-remove (node)
+  "Removes the given node from the list and all links to and from it"
+  (progn  
+    (setf *links* (remove-if #'(lambda (l) (or (eq (from-node l) node) (eq (to-node l) node))) *links*))
+    (setf *nodes* (remove node *nodes*))))
+
 ;;; Functions and Macros for links
 (defun link-create (type from-node to-node &key properties)
   (if (eq from-node to-node)
@@ -137,3 +145,10 @@
 (defun links-to-node (node &optional (list *links*))
   "Retursn a list of only links ending at a specified node from a list"
   (remove-if-not #'(lambda (n) (eq node (to-node n))) list))
+
+;; There could be more than one link conecting two nodes so the type is required.
+(defun link-remove (node-type node-from node-to)
+  "Revove a link given the type starting and ending nodes"
+  (setf *links* (remove-if #'(lambda (l) (and (eq (from-node l) node-from) 
+					      (eq (to-node l) node-to) 
+					      (eq (of-type l) node-type))) *links*)))

@@ -4,9 +4,9 @@
 
 ## Overview:
 
-Proto-graph is a prototyping graph-database (ala Neo4j) written completely in Common lisp, although it now aspires to be more than just a prototyping tool.
+Proto-graph is a prototyping [graph database](https://en.wikipedia.org/wiki/Graph_database) (ala [Neo4j](http://www.neo4j.org/)) written completely in Common lisp, although it now aspires to be more than just a prototyping tool.
 
-Graph DBs are a form of no-SQL databases which are based on Math Graphs. In proto-graph nodes are called *nodes*, and edges are called *links*. Both *nodes* and *links* are CLOS classes, derived from a more primitive class called *thing*.
+Graph DBs are a form of [NoSQL](https://en.wikipedia.org/wiki/NoSQL) databases which are based on [Math Graphs](https://en.wikipedia.org/wiki/Graph_theory). In proto-graph nodes are called *nodes*, and edges are called *links*. Both *nodes* and *links* are CLOS classes, derived from a more primitive class called *thing*.
 
 Each node can have one ore several labels, represented by keyword parameters, if no label is provided the `:default` label is used. Nodes also have a list of properties, represented by a p-list where the keys are keyword parameters, and the values can be of any type, the matching is performed using an `equal` equality predicate.
 
@@ -32,7 +32,9 @@ The database should be persistent, and fully CRUD.
 
 Currently proto-graph can:
 * Create Nodes with labels and properties, no sanity check is done on the user input. `(node-create ...)`
+* Delete Nodes `(node-remove ...)`
 * Create directed Links each with type and optinally properties. `(link-create ...)`
+* Delete Links `(link-remove ...)`
 * Modify the properties of both Nodes and Links. `(setf (get-property ...))`
 * Find Nodes with particular labels and or properties. `(node-match ...)`
 * Find Links of a particular type.  `(links-with-type ...)`
@@ -41,7 +43,7 @@ Currently proto-graph can:
 * Nest Link finding functions to combine the functionality.
 * Dumping properties of a node or a link. `(dump-props ...)`
 
-Currently the DB is non persistent, and there are no functions to delete records. Functionality to modify labels in nodes, or types in links, is still missing.
+Currently the DB is non persistent. Functionality to modify labels in nodes, or types in links, is still missing.
 
 ## Notes:
 
@@ -92,4 +94,6 @@ Which will give the following result:
 
 Of course, the result is ugly and not very legible, because it is merely using the print-unreadable-object, but we can see that we have the rudiments for querying a graph database.
 
-Currently proto-graph does not check that an identical register already exists in the database before creating it, and there is no way to delete records from the database. Modifying properties or adding new ones should be possible, set-prop is not really needed, since you can setf get-prop, so I will eliminate it. These changes would be necessary just to make it CRUD, and later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
+Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible, set-prop should not really be needed, since you coud setf get-prop, so I will eliminate it once I make it setf-able.
+
+Later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
