@@ -130,9 +130,21 @@
     (setf *links* (remove-if #'(lambda (l) (or (eq (from-node l) node) (eq (to-node l) node))) *links*))
     (setf *nodes* (remove node *nodes*))))
 
+(defun links-with-type (type &optional (list *links*))
+  "Returns a list of only links with a specified type from a list"
+  (remove-if-not (lambda (n)(equal type (of-type n))) list))
+
+(defun links-to-node (node &optional (list *links*))
+  "Retursn a list of only links ending at a specified node from a list"
+  (remove-if-not #'(lambda (n) (eq node (to-node n))) list))
+
 (defun nodes-linked-to (node &optional of-type)
   (mapcar #'from-node (if of-type (links-with-type of-type (links-to-node node))
 			  (links-to-node node))))
+
+(defun links-from-node (node &optional (list *links*))
+  "Retursn a list of only links starting at a specified node from a list"
+  (remove-if-not #'(lambda (n) (eq node (from-node n))) list))
 
 (defun nodes-linked-from (node &optional of-type)
   (mapcar #'to-node (if of-type (links-with-type of-type (links-from-node node))
@@ -143,18 +155,6 @@
   (if (eq from-node to-node)
       (error "From and to nodes can not be equal")
       (car (push (make-instance 'link :type type :from-node from-node :to-node to-node :properties properties) *links*))))
-
-(defun links-with-type (type &optional (list *links*))
-  "Returns a list of only links with a specified type from a list"
-  (remove-if-not (lambda (n)(equal type (of-type n))) list))
-
-(defun links-from-node (node &optional (list *links*))
-  "Retursn a list of only links starting at a specified node from a list"
-  (remove-if-not #'(lambda (n) (eq node (from-node n))) list))
-
-(defun links-to-node (node &optional (list *links*))
-  "Retursn a list of only links ending at a specified node from a list"
-  (remove-if-not #'(lambda (n) (eq node (to-node n))) list))
 
 ;; There could be more than one link conecting two nodes so the type is required.
 (defun link-remove (node-type node-from node-to)
