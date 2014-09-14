@@ -5,6 +5,8 @@
 	   :node-match
 	   :node-remove
 	   :link-create
+	   :nodes-linked-from
+	   :nodes-linked-to
 	   :get-prop
 	   :set-prop
 	   :dump-props 
@@ -127,6 +129,14 @@
   (progn  
     (setf *links* (remove-if #'(lambda (l) (or (eq (from-node l) node) (eq (to-node l) node))) *links*))
     (setf *nodes* (remove node *nodes*))))
+
+(defun nodes-linked-to (node &optional of-type)
+  (mapcar #'from-node (if of-type (links-with-type of-type (links-to-node node))
+			  (links-to-node node))))
+
+(defun nodes-linked-from (node &optional of-type)
+  (mapcar #'to-node (if of-type (links-with-type of-type (links-from-node node))
+			  (links-from-node node))))
 
 ;;; Functions and Macros for links
 (defun link-create (type from-node to-node &key properties)

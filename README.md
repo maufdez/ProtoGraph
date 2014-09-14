@@ -10,11 +10,11 @@ Graph DBs are a form of [NoSQL](https://en.wikipedia.org/wiki/NoSQL) databases w
 
 Each node can have one ore several labels, represented by keyword parameters, if no label is provided the `:default` label is used. Nodes also have a list of properties, represented by a p-list where the keys are keyword parameters, and the values can be of any type, the matching is performed using an `equal` equality predicate.
 
-Each link must have a *type* which is also a keyword paramenter, a *from-node* and a *to-node*, which cannot be the same node. Links can also have a property list with the same characteristics as the properties for a node.
+Each link must have a *type* which is also a keyword parameter, a *from-node* and a *to-node*, which cannot be the same node. Links can also have a property list with the same characteristics as the properties for a node.
 
 ## Expected functionality:
 
-The user should be able to find particular nodes, based on *label* and/or *properties*, and move to or from those nodes trough links to find other nodes related to it, this relation (*type*) and the properties of it can also be part of the querie, and any property from nodes and links, the node labels and link type should be easily extractable for use as the query results.
+The user should be able to find particular nodes, based on *label* and/or *properties*, and move to or from those nodes trough links to find other nodes related to it, this relation (*type*) and the properties of it can also be part of the query, and any property from nodes and links, the node labels and link type should be easily extractable for use as the query results.
 
 The user should also be able to find a particular link, based on *type* and/or properties and move from there as described above.
 
@@ -26,7 +26,7 @@ The database should be persistent, and fully CRUD.
 
 * Proto-graph should be fully programmed in Common Lisp, with no backend SQL database, and no calls to libaries written in other languages, it also will use only libraries that only depend on Common Lisp (no external DBs or FFIs).
 * Proto-graph shuld have an s-expression based query language which does not look foreight to LISPers.
-* Proto-graph is for LISPers, any API to make it accessible to other languages is not prioritary.
+* Proto-graph is for LISPers, any API to make it accessible to other languages is not priority.
 
 ## Current functionality:
 
@@ -42,6 +42,7 @@ Currently proto-graph can:
 * Find Links wich end at a particular node. `(links-to-node ...)`
 * Nest Link finding functions to combine the functionality.
 * Dumping properties of a node or a link. `(dump-props ...)`
+* Look for nodes connected to or from a particular node, optinally of a particular type with `(rec-search ...)`
 
 Currently the DB is non persistent. Functionality to modify labels in nodes, or types in links, is still missing.
 
@@ -94,6 +95,8 @@ Which will give the following result:
 
 Of course, the result is ugly and not very legible, because it is merely using the print-unreadable-object, but we can see that we have the rudiments for querying a graph database.
 
-Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible, set-prop should not really be needed, since you coud setf get-prop, so I will eliminate it once I make it setf-able.
+Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible, set-prop should not really be needed, since you could setf get-prop, so I will eliminate it once I make it setf-able.
 
 Later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
+
+With the recent addition of `rec-search` we have a good base for a query language, I discuss a sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently there is no ASDF for the project so you should load proto-graph first and then proto-query, and optianlly move to the proto-query package to use these functions. I will be adding all of that later to make it easier to load.
