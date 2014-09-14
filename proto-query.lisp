@@ -2,6 +2,8 @@
   (:use :common-lisp :proto-graph)
   (:export :rec-search))
 
+(in-package :proto-query)
+
 (defun rec-search (dir nodes &optional linktype)
   (let ((funct (cond ((eq dir :to) #'nodes-linked-to)
 		     ((eq dir :from) #'nodes-linked-from)
