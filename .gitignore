@@ -10,3 +10,4 @@
 # Ignore EMACS temporary files
 *~
 
+#proto-graph.asd#
