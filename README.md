@@ -76,27 +76,36 @@ Now we can create links for our graph:
 (link-create :directs *lucas* *movie*)
 ```
 
-With the database now in place, we can find the names of the cast:
+With the database now in place, we can find the names of the cast, but first we can create a helper function to get the names instead of the printed representation of the node, that would look something like this:
+
+````common-lisp
+(defun print-actor (actor)
+  (format nil "~a ~a" (get-prop actor :name) (get-prop actor :surname)))
+````
+and now using `rec-search` we can write a function to get a list of all the actors in a movie.
 
 ```common-lisp
-(links-with-type :acts-on (links-to-node *movie*))
+(defun get-actors (movie) (mapcar #'print-actor (rec-search :to movie :acts-on)))
 ```
+and finally by calling this function against our `*movie*`
+
+````common-lisp
+(get-actors *movie*)
+````
 
 Which will give the following result:
 
-```
-(#<PROTO-GRAPH::LINK
-   #<NODE ID: 2 |NAME: Carrie |SURNAME: Fisher > [ACTS-ON]  #<NODE
-                                                              ID: 4 |TITLE: Star Wars >>
- #<PROTO-GRAPH::LINK
-   #<NODE ID: 1 |NAME: Harrison |SURNAME: Ford > [ACTS-ON]  #<NODE
-                                                              ID: 4 |TITLE: Star Wars >>)
+```common-lisp
+("Carrie Fisher" "Harrison Ford")
 ```
 
-Of course, the result is ugly and not very legible, because it is merely using the print-unreadable-object, but we can see that we have the rudiments for querying a graph database.
+In this case, by writing a couple of functions we are able to get a list of actor names, it is probably not very impressive, but we can see that we have the rudiments for querying a graph database.
 
-Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible, set-prop should not really be needed, since you could setf get-prop, so I will eliminate it once I make it setf-able.
+Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible using get-prop and set-prop.
 
 Later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
 
-With the recent addition of `rec-search` we have a good base for a query language, I discuss a sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently there is no ASDF for the project so you should load proto-graph first and then proto-query, and optianlly move to the proto-query package to use these functions. I will be adding all of that later to make it easier to load.
+With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently we have an ASDF file, but I have not tested that it works, if it does not you should load proto-graph first and then proto-query, and optianlly move to the proto-query package to use these functions. I will be testing all of that later to make it easier to load.
+
+<!--  LocalWords:  proto ASDF LocalWords
+ -->
