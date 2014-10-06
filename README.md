@@ -24,8 +24,8 @@ The database should be persistent, and fully CRUD.
 
 ## Other goals:
 
-* Proto-graph should be fully programmed in Common Lisp, with no backend SQL database, and no calls to libaries written in other languages, it also will use only libraries that only depend on Common Lisp (no external DBs or FFIs).
-* Proto-graph shuld have an s-expression based query language which does not look foreight to LISPers.
+* Proto-graph should be fully programmed in Common Lisp, with no back-end SQL database, and no calls to libraries written in other languages, it also will use only libraries that only depend on Common Lisp (no external DBs or FFIs).
+* Proto-graph should have an s-expression based query language which does not look foreign to LISPers.
 * Proto-graph is for LISPers, any API to make it accessible to other languages is not priority.
 
 ## Current functionality:
@@ -43,6 +43,8 @@ Currently proto-graph can:
 * Nest Link finding functions to combine the functionality.
 * Dumping properties of a node or a link. `(dump-props ...)`
 * Look for nodes connected to or from a particular node, optinally of a particular type with `(rec-search ...)`
+* Look for nodes connected to any depth optionaly by links of a particular type with `(deep-rec-search ...)`
+* Create closures that call the next level of connected nodes each time they are call, with cycle protection `(make-safe-deep-searcher ...)` or without it `(make-deep-searcher ...)`, this are meant to be used inside the library but I am exposing them for experimentation purposes.
 
 Currently the DB is non persistent. Functionality to modify labels in nodes, or types in links, is still missing.
 
@@ -107,5 +109,7 @@ Later I need to make the DB persistent, and add some sugar around stuff to make 
 
 With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently we have an ASDF file, but I have not tested that it works, if it does not you should load proto-graph first and then proto-query, and optianlly move to the proto-query package to use these functions. I will be testing all of that later to make it easier to load.
 
-<!--  LocalWords:  proto ASDF LocalWords
+The most recent addition to the API is `deep-rec-search`, I tested this with a differen database, but basically what it does is to recursively go to the links, the links of the links, etc, skipping paths with an already visited link (to avoid getting stuck in a infinite loop), and it stops when the predetermined depth is reached, or there are no more links to follow.
+
+<!--  LocalWords:  proto ASDF LocalWords FFIs Organa
  -->
