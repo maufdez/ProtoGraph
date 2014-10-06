@@ -33,17 +33,17 @@ The database should be persistent, and fully CRUD.
 Currently proto-graph can:
 * Create Nodes with labels and properties, no sanity check is done on the user input. `(node-create ...)`
 * Delete Nodes `(node-remove ...)`
-* Create directed Links each with type and optinally properties. `(link-create ...)`
+* Create directed Links each with type and optionally properties. `(link-create ...)`
 * Delete Links `(link-remove ...)`
 * Modify the properties of both Nodes and Links. `(setf (get-property ...))`
 * Find Nodes with particular labels and or properties. `(node-match ...)`
 * Find Links of a particular type.  `(links-with-type ...)`
 * Find Links which start at a particular node. `(links-from-node ...)`
-* Find Links wich end at a particular node. `(links-to-node ...)`
+* Find Links which end at a particular node. `(links-to-node ...)`
 * Nest Link finding functions to combine the functionality.
 * Dumping properties of a node or a link. `(dump-props ...)`
-* Look for nodes connected to or from a particular node, optinally of a particular type with `(rec-search ...)`
-* Look for nodes connected to any depth optionaly by links of a particular type with `(deep-rec-search ...)`
+* Look for nodes connected to or from a particular node, optionally of a particular type with `(rec-search ...)`
+* Look for nodes connected to any depth optionally by links of a particular type with `(deep-rec-search ...)`
 * Create closures that call the next level of connected nodes each time they are call, with cycle protection `(make-safe-deep-searcher ...)` or without it `(make-deep-searcher ...)`, this are meant to be used inside the library but I am exposing them for experimentation purposes.
 
 Currently the DB is non persistent. Functionality to modify labels in nodes, or types in links, is still missing.
@@ -107,9 +107,9 @@ Currently proto-graph does not check that an identical register already exists i
 
 Later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
 
-With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently we have an ASDF file, but I have not tested that it works, if it does not you should load proto-graph first and then proto-query, and optianlly move to the proto-query package to use these functions. I will be testing all of that later to make it easier to load.
+With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently we have an ASDF file, but I have not tested that it works, if it does not you should load proto-graph first and then proto-query, and optionally move to the proto-query package to use these functions. I will be testing all of that later to make it easier to load.
 
-The most recent addition to the API is `deep-rec-search`, I tested this with a differen database, but basically what it does is to recursively go to the links, the links of the links, etc, skipping paths with an already visited link (to avoid getting stuck in a infinite loop), and it stops when the predetermined depth is reached, or there are no more links to follow.
+The most recent addition to the API is `deep-rec-search`, I tested this with a different database, but basically what it does is to recursively go to the links, the links of the links, etc, skipping paths with an already visited link (to avoid getting stuck in a infinite loop), and it stops when the predetermined depth is reached, or there are no more links to follow.
 
 <!--  LocalWords:  proto ASDF LocalWords FFIs Organa
  -->
