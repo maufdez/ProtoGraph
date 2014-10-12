@@ -35,7 +35,7 @@ Currently proto-graph can:
 * Delete Nodes `(node-remove ...)`
 * Create directed Links each with type and optionally properties. `(link-create ...)`
 * Delete Links `(link-remove ...)`
-* Modify the properties of both Nodes and Links. `(setf (get-property ...))`
+* Read the properties of both Nodes and Links. `(get-prop ...)`, which can also be setf'ed.
 * Find Nodes with particular labels and or properties. `(node-match ...)`
 * Find Links of a particular type.  `(links-with-type ...)`
 * Find Links which start at a particular node. `(links-from-node ...)`
@@ -103,7 +103,7 @@ Which will give the following result:
 
 In this case, by writing a couple of functions we are able to get a list of actor names, it is probably not very impressive, but we can see that we have the rudiments for querying a graph database.
 
-Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible using get-prop and set-prop.
+Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible using `get-prop` and `setf` on it.
 
 Later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
 
