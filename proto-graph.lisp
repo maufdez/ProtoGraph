@@ -8,7 +8,6 @@
 	   :nodes-linked-from
 	   :nodes-linked-to
 	   :get-prop
-	   :set-prop
 	   :dump-props 
 	   :links-with-type
 	   :links-from-node
@@ -86,7 +85,7 @@
 
 (defmethod get-prop ((object thing) property)
   (getf (properties object) property))
-   
+
 (defmethod set-prop ((object thing) property value)
   (setf (getf (properties object) property) value))
 
@@ -98,6 +97,8 @@
 
 (defmethod meets-filter ((object thing))
   (reduce (lambda (a b)(and a b))(mapcar (lambda (p)(equal (getf *filters* p)(get-prop object p)))(get-keys *filters*))))
+
+(defsetf get-prop set-prop)
 
 ;;; Functions and Macros for nodes
 (defun node-create (&key (label :default) properties)
