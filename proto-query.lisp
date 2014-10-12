@@ -8,19 +8,24 @@
 (in-package :proto-query)
 
 (defun rec-search (dir nodes &optional linktype)
+  "Looks for all nodes connected in the given direction (:to or :from) by links of linktype or any type if not given"
   (let ((funct (cond ((eq dir :to) #'nodes-linked-to)
 		     ((eq dir :from) #'nodes-linked-from)
 		     (t (error "Direction must be :to or :from")))))
-    (if (consp nodes) (if nodes (append (funcall funct (car nodes) linktype)(rec-search dir (cdr nodes) linktype))
+    (if (consp nodes) (if nodes (nconc (funcall funct (car nodes) linktype)(rec-search dir (cdr nodes) linktype))
 			  nil)
 	(funcall funct nodes linktype))))
 
+
+
 (defun make-deep-searcher (dir nodes &optional linktype)
+  "Creates a closure which will recursively look for nodes connected in the given dir (:to or :from) with liktyp, or any type of link if not given"
   (let ((depth 0) (current-nodes nodes))
     (lambda () (if current-nodes (values (incf depth) (setf current-nodes (rec-search dir current-nodes linktype)))
 		   (values depth current-nodes)))))
 
 (defun make-safe-deep-searcher (dir nodes &optional linktype)
+  "Same as make-deep-searcher, but keeps a record of visited nodes and avoids visiting them again (endless cycle protection)"
   (let ((visited ())
 	(depth 0)
 	(current-nodes (if (atom nodes) (list nodes) nodes)))
@@ -31,6 +36,9 @@
 		     (values depth current-nodes))))))
 
 (defun deep-rec-search (dir nodes depth &optional linktype)
+  "Takes a direction which can be :to or :from, a list of nodes or a single node, a depth and optionally a link type
+   it does return a list of all nodes that follow a linktype relationship (or any type of relationship, if linktype
+   is not provided, upto the given depth, without going into already visited nodes"
   (let ((search (make-safe-deep-searcher dir nodes linktype)))
     (do (final result)(final result) 
       (multiple-value-bind (cur-depth ret-nodes) (funcall search) 
