@@ -1,6 +1,6 @@
 # Proto-Graph: A graph database.
 
-**Note:** As of 7/27/2014 I am keeping my ramblings in the Wiki to keep the README cleaner and more relevant to the reader.
+**Note:** As of 7/27/2014 I am keeping my ramblings in the [Wiki](https://github.com/maufdez/ProtoGraph/wiki) to keep the README cleaner and more relevant to the reader.
 
 ## Overview:
 
@@ -107,7 +107,7 @@ Currently proto-graph does not check that an identical register already exists i
 
 Later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
 
-With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently we have an ASDF file, but I have not tested that it works, if it does not you should load proto-graph first and then proto-query, and optionally move to the proto-query package to use these functions. I will be testing all of that later to make it easier to load.
+With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently we have an ASDF file, and that it works, you have to add the directory to the `*central-registry*`.
 
 The most recent addition to the API is `deep-rec-search`, I tested this with a different database, but basically what it does is to recursively go to the links, the links of the links, etc, skipping paths with an already visited link (to avoid getting stuck in a infinite loop), and it stops when the predetermined depth is reached, or there are no more links to follow.
 
