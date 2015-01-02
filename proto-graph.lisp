@@ -1,6 +1,8 @@
 (defpackage :proto-graph 
   (:use :common-lisp)
-  (:export :get-keys 
+  (:export :get-keys
+	   :all-nodes
+	   :all-links
 	   :node-create
 	   :node-match
 	   :node-remove
@@ -12,7 +14,9 @@
 	   :links-with-type
 	   :links-from-node
 	   :links-to-node 
-	   :link-remove ))
+	   :link-remove 
+	   :link-get-types
+	   :link-match))
 
 (in-package :proto-graph)
 
@@ -93,12 +97,21 @@
   (format t "~{~a:~10t~a~%~}~%" (properties object)))
 
 (defgeneric meets-filter (object)
-  (:documentation "Uses the filters stored in the special variable *filters* to check if the properties of a method meet it"))
+  (:documentation "Uses the filters stored in the special variable *filters* to check if the properties of a thing meet it"))
 
 (defmethod meets-filter ((object thing))
   (reduce (lambda (a b)(and a b))(mapcar (lambda (p)(equal (getf *filters* p)(get-prop object p)))(get-keys *filters*))))
 
 (defsetf get-prop set-prop)
+
+;; Convenience functions for accessing data
+(defun all-nodes () 
+  "Returns the list of all nodes in the database"
+  *nodes*)
+
+(defun all-links ()
+  "Returns the list of all links in the database"
+  *links*)
 
 ;;; Functions and Macros for nodes
 (defun node-create (&key (label :default) properties)
@@ -108,12 +121,12 @@
 (defun has-label (label)
   (remove-if-not (lambda (n)(find label (label-list n))) *nodes*))
 
-(defun node-match (&key label properties)
+(defun node-match (&key label properties (nodes *nodes*))
   (let ((*filters* properties))
     (if label (if properties (remove-if-not #'meets-filter (has-label label))
 		  (has-label label))
-	(if properties (remove-if-not #'meets-filter *nodes*)
-	    *nodes*))))
+	(if properties (remove-if-not #'meets-filter nodes)
+	    nodes))))
 
 (defmethod print-object ((object node) stream)
   (print-unreadable-object (object stream :type t)
@@ -139,17 +152,17 @@
   "Retursn a list of only links ending at a specified node from a list"
   (remove-if-not #'(lambda (n) (eq node (to-node n))) list))
 
-(defun nodes-linked-to (node &optional of-type)
-  (mapcar #'from-node (if of-type (links-with-type of-type (links-to-node node))
-			  (links-to-node node))))
+(defun nodes-linked-to (node &key link-type (link-list *links*))
+  (mapcar #'from-node (if link-type (links-with-type link-type (links-to-node node link-list))
+			  (links-to-node node link-list))))
 
 (defun links-from-node (node &optional (list *links*))
   "Retursn a list of only links starting at a specified node from a list"
   (remove-if-not #'(lambda (n) (eq node (from-node n))) list))
 
-(defun nodes-linked-from (node &optional of-type)
-  (mapcar #'to-node (if of-type (links-with-type of-type (links-from-node node))
-			  (links-from-node node))))
+(defun nodes-linked-from (node &key link-type (link-list *links*))
+  (mapcar #'to-node (if link-type (links-with-type link-type (links-from-node node link-list))
+			  (links-from-node node link-list))))
 
 ;;; Functions and Macros for links
 (defun link-create (type from-node to-node &key properties)
@@ -163,3 +176,13 @@
   (setf *links* (remove-if #'(lambda (l) (and (eq (from-node l) node-from) 
 					      (eq (to-node l) node-to) 
 					      (eq (of-type l) node-type))) *links*)))
+
+(defun link-get-types (from-node to-node)
+  (mapcar #'of-type (links-from-node from-node (links-to-node to-node))))
+
+(defun link-match (&key of-type properties (links *links*))
+  (let ((*filters* properties))
+    (if of-type (if properties (remove-if-not #'meets-filter (links-with-type of-type))
+		  (links-with-type of-type))
+	(if properties (remove-if-not #'meets-filter links)
+	    links))))

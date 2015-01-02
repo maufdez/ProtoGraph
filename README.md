@@ -12,6 +12,10 @@ Each node can have one ore several labels, represented by keyword parameters, if
 
 Each link must have a *type* which is also a keyword parameter, a *from-node* and a *to-node*, which cannot be the same node. Links can also have a property list with the same characteristics as the properties for a node.
 
+## Most recent changes:
+
+I just recently did some changes to enhance filtering based on link information such as link type or it's properties.
+
 ## Expected functionality:
 
 The user should be able to find particular nodes, based on *label* and/or *properties*, and move to or from those nodes trough links to find other nodes related to it, this relation (*type*) and the properties of it can also be part of the query, and any property from nodes and links, the node labels and link type should be easily extractable for use as the query results.
@@ -38,9 +42,11 @@ Currently proto-graph can:
 * Read the properties of both Nodes and Links. `(get-prop ...)`, which can also be setf'ed.
 * Find Nodes with particular labels and or properties. `(node-match ...)`
 * Find Links of a particular type.  `(links-with-type ...)`
+* Find Links of a particular type and or maching particular properties. `(link-match ...)`
 * Find Links which start at a particular node. `(links-from-node ...)`
 * Find Links which end at a particular node. `(links-to-node ...)`
 * Nest Link finding functions to combine the functionality.
+* Get all the types of links between two given nodes (dirctionally). `(link-get-types ...)` which in case of no links returns nil.
 * Dumping properties of a node or a link. `(dump-props ...)`
 * Look for nodes connected to or from a particular node, optionally of a particular type with `(rec-search ...)`
 * Look for nodes connected to any depth optionally by links of a particular type with `(deep-rec-search ...)`
@@ -50,11 +56,22 @@ Currently the DB is non persistent. Functionality to modify labels in nodes, or 
 
 ## Notes:
 
-Contributions and critics are welcomed, but bear in mind this is still very raw.
+Contributions and critics are welcomed, the next stage is adding persistence, which I am explaining on the [wiki](https://github.com/maufdez/ProtoGraph/wiki/Persistency).
+
+Some of the examples in the wiki need to be upgrated to the latest rev, since the API has changed a little, this means that even when the same queries are possible, the calls in the old stype may fail since I was using optional paramenters before and I am using keys now. I will be making an example session with interesting cases.
 
 ## Example usage (With the current functions)
 
 Let's say we want to create a movie database, with the names of the actors, directors, movies, and maybe later some other information like locations, etc.
+
+First let's make a test package and move to it.
+
+```common-lisp
+(defpackage :movies
+  (:use :common-lisp :proto-graph :proto-query))
+
+(in-package :movies)
+```
 
 I will start adding one movie, with a couple of actors and the director:
 
@@ -87,7 +104,7 @@ With the database now in place, we can find the names of the cast, but first we 
 and now using `rec-search` we can write a function to get a list of all the actors in a movie.
 
 ```common-lisp
-(defun get-actors (movie) (mapcar #'print-actor (rec-search :to movie :acts-on)))
+(defun get-actors (movie) (mapcar #'print-actor (rec-search :to movie :link-type :acts-on)))
 ```
 and finally by calling this function against our `*movie*`
 
@@ -101,15 +118,17 @@ Which will give the following result:
 ("Carrie Fisher" "Harrison Ford")
 ```
 
-In this case, by writing a couple of functions we are able to get a list of actor names, it is probably not very impressive, but we can see that we have the rudiments for querying a graph database.
+In this case, by writing a couple of functions we are able to get a list of actor names.
 
 Currently proto-graph does not check that an identical register already exists in the database before creating it. Modifying properties or adding new ones should be possible using `get-prop` and `setf` on it.
 
-Later I need to make the DB persistent, and add some sugar around stuff to make it easier to use.
+Later I need to make the DB persistent, and add some sugar around query functions to make it easier to use.
 
-With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki), currently we have an ASDF file, and that it works, you have to add the directory to the `*central-registry*`.
+With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki)**(the Wiki needs revision)**, currently we have an ASDF file which should work, you have to add the directory to the `*central-registry*`.
 
-The most recent addition to the API is `deep-rec-search`, I tested this with a different database, but basically what it does is to recursively go to the links, the links of the links, etc, skipping paths with an already visited link (to avoid getting stuck in a infinite loop), and it stops when the predetermined depth is reached, or there are no more links to follow.
+The API also contains a  `deep-rec-search`, I tested this with a different database, but basically what it does is to recursively go to the links, the links of the links, etc, skipping paths with an already visited link (to avoid getting stuck in a infinite loop), and it stops when the predetermined depth is reached, or there are no more links to follow.
 
-<!--  LocalWords:  proto ASDF LocalWords FFIs Organa
+<!--  LocalWords:  proto ASDF LocalWords FFIs Organa Persistency API
+ -->
+<!--  LocalWords:  defpackage lucas defvar mapcar wiki ProtoGraph
  -->
