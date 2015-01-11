@@ -1,6 +1,7 @@
 (defpackage :proto-query
   (:use :common-lisp :proto-graph)
   (:export :rec-search
+	   :link-search
 	   :make-deep-searcher
 	   :make-safe-deep-searcher
 	   :deep-rec-search))
@@ -8,7 +9,7 @@
 (in-package :proto-query)
 
 (defun rec-search (dir nodes &key (link-type nil)(link-list (all-links)))
-  "Looks for all nodes connected in the given direction (:to or :from) by links of linktype or any type if not given"
+  "Looks for all nodes connected in the given direction (:to or :from) by links of linktype or any type if not given returns a list of nodes"
   (let ((funct (cond ((eq dir :to) #'nodes-linked-to)
 		     ((eq dir :from) #'nodes-linked-from)
 		     (t (error "Direction must be :to or :from")))))
@@ -17,6 +18,18 @@
 			  nil)
 	(funcall funct nodes :link-type link-type :link-list link-list))))
 
+(defun link-search (dir nodes &key (link-type nil)(link-list (all-links)))
+  "Looks for all nodes connected in the given direction (:to or :from) by links of linktype or any type if not given returns a list of links"
+  (let ((link-list (if link-type 
+		       (links-with-type link-type link-list) 
+		       link-list))
+	(funct (cond ((eq dir :to) #'links-to-node)
+		     ((eq dir :from) #'links-from-node)
+		     (t (error "Direction must be :to or :from")))))
+    (if (consp nodes) (if nodes (nconc (funcall funct (car nodes) link-list)
+				       (link-search dir (cdr nodes) :link-list link-list))
+			  nil)
+	(funcall funct nodes link-list))))
 
 
 (defun make-deep-searcher (dir nodes &key (link-type nil) (link-list (all-links)))
