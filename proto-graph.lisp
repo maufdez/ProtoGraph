@@ -118,13 +118,13 @@
   ;;I use a CAR to have the function return just the node that was just added.
   (car (push (make-instance 'node :label-list (list label) :properties properties) *nodes*)))
 
-(defun has-label (label)
-  (remove-if-not (lambda (n)(find label (label-list n))) *nodes*))
+(defun has-label (label &optional (nodes *nodes*))
+  (remove-if-not (lambda (n)(find label (label-list n))) nodes))
 
 (defun node-match (&key label properties (nodes *nodes*))
   (let ((*filters* properties))
-    (if label (if properties (remove-if-not #'meets-filter (has-label label))
-		  (has-label label))
+    (if label (if properties (remove-if-not #'meets-filter (has-label label nodes))
+		  (has-label label nodes))
 	(if properties (remove-if-not #'meets-filter nodes)
 	    nodes))))
 
@@ -182,7 +182,7 @@
 
 (defun link-match (&key of-type properties (links *links*))
   (let ((*filters* properties))
-    (if of-type (if properties (remove-if-not #'meets-filter (links-with-type of-type))
-		  (links-with-type of-type))
+    (if of-type (if properties (remove-if-not #'meets-filter (links-with-type of-type links))
+		  (links-with-type of-type links))
 	(if properties (remove-if-not #'meets-filter links)
 	    links))))
