@@ -49,6 +49,7 @@ Currently proto-graph can:
 * Get all the types of links between two given nodes (dirctionally). `(link-get-types ...)` which in case of no links returns nil.
 * Dumping properties of a node or a link. `(dump-props ...)`
 * Look for nodes connected to or from a particular node, optionally of a particular type with `(rec-search ...)`
+* Look for links starting from or ending in a particular node, optionally of a particular type with `(link-search ...)`
 * Look for nodes connected to any depth optionally by links of a particular type with `(deep-rec-search ...)`
 * Create closures that call the next level of connected nodes each time they are call, with cycle protection `(make-safe-deep-searcher ...)` or without it `(make-deep-searcher ...)`, this are meant to be used inside the library but I am exposing them for experimentation purposes.
 
@@ -124,11 +125,9 @@ Currently proto-graph does not check that an identical register already exists i
 
 Later I need to make the DB persistent, and add some sugar around query functions to make it easier to use.
 
-With the recent addition of `rec-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki)**(the Wiki needs revision)**, currently we have an ASDF file which should work, you have to add the directory to the `*central-registry*`.
+With the addition of `rec-search` and `link-search` we have a good base for a query language, I discuss a more interesting sample use on the [wiki](https://github.com/maufdez/ProtoGraph/wiki)**(the Wiki needs revision)**, currently we have an ASDF file which should work, you have to add the directory to the `*central-registry*`.
 
 The API also contains a  `deep-rec-search`, I tested this with a different database, but basically what it does is to recursively go to the links, the links of the links, etc, skipping paths with an already visited link (to avoid getting stuck in a infinite loop), and it stops when the predetermined depth is reached, or there are no more links to follow.
 
-<!--  LocalWords:  proto ASDF LocalWords FFIs Organa Persistency API
- -->
-<!--  LocalWords:  defpackage lucas defvar mapcar wiki ProtoGraph
+<!--  LocalWords:  proto ASDF LocalWords FFIs Organa Persistency API defpackage lucas defvar mapcar wiki ProtoGraph
  -->
