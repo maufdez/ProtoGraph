@@ -1,6 +1,9 @@
 (defpackage :proto-graph 
   (:use :common-lisp)
   (:export :get-keys
+	   :id
+	   :from-node
+	   :to-node
 	   :all-nodes
 	   :all-links
 	   :node-create
@@ -16,7 +19,8 @@
 	   :links-to-node 
 	   :link-remove 
 	   :link-get-types
-	   :link-match))
+	   :link-match
+	   :clear-db))
 
 (in-package :proto-graph)
 
@@ -186,3 +190,9 @@
 		  (links-with-type of-type links))
 	(if properties (remove-if-not #'meets-filter links)
 	    links))))
+
+;;; General database management.
+(defun clear-db ()
+  "Clears the dabase nodes and links"
+  (setf *nodes* nil)
+  (setf *links* nil))
