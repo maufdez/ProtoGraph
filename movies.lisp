@@ -46,13 +46,13 @@
 
 ;;; Defining Raiders of the Lost Ark
 
-(setf *node* (setf *movie* (node-create :label :movie :properties '(:name "Raiders of the Lost Ark"))))
+(setf *movie* (node-create :label :movie :properties '(:name "Raiders of the Lost Ark")))
 (setf *node* (car (node-match :label :person :properties '(:name "Harrison" :surname "Ford"))))
 (link-create :acted-on *node* *movie* :properties '(:plays "Indy"))
 (setf *node* (node-create :label :person :properties '(:name "Karen" :surname "Allen")))
 (link-create :acted-on *node* *movie* :properties '(:plays "Marion Ravenwood"))
 (setf *node* (node-create :label :person :properties '(:name "Paul" :surname "Freeman")))
-(link-create :acted-on *node* *movie* :properties '(:plays "Dr. René Belloq"))
+(link-create :acted-on *node* *movie* :properties '(:plays "Dr. RenÃ© Belloq"))
 (setf *node* (node-create :label :person :properties '(:name "Ronald" :surname "Lacey")))
 (link-create :acted-on *node* *movie* :properties '(:plays "Major Arnold Toht"))
 (setf *node* (node-create :label :person :properties '(:name "John" :surname "Rhys-Davies")))
